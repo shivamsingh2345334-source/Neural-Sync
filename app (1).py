@@ -7,6 +7,7 @@ from tensorflow.keras.models import load_model
 df = pd.read_csv("motor_data.csv")
 model = load_model("failure_predictor_lstm.h5")
 
+
 st.set_page_config(page_title="Neural-Sync Dashboard", layout="wide")
 
 st.title("⚙️ Neural-Sync — Predictive Maintenance Dashboard")
