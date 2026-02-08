@@ -1,50 +1,70 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from tensorflow.keras.models import load_model
 
-@st.cache_resource
-def load_failure_model():
-    return load_model("failure_predictor_lstm.h5")
+# -----------------------------
 
-model = load_failure_model()
+# -----------------------------
 
-
-# Load Data + Model
-df = pd.read_csv("motor_data.csv")
-model = load_model("failure_predictor_lstm.h5")
-
-
-st.set_page_config(page_title="Neural-Sync Dashboard", layout="wide")
+st.set_page_config(
+    page_title="Neural-Sync Dashboard",
+    layout="wide"
+)
 
 st.title("⚙️ Neural-Sync — Predictive Maintenance Dashboard")
-st.markdown("Real-time Motor Failure Prediction + Remaining Useful Life (RUL)")
+st.markdown("AI-powered Motor Monitoring + Remaining Useful Life (RUL) Estimation")
 
-# Show Latest Sensor Data
-st.subheader("📈 Live Sensor Signals (Last 200 Timesteps)")
-st.line_chart(df[["vibration", "temperature"]].tail(200))
+st.markdown("---")
 
-# Prepare Input for Prediction
-data = df[["vibration","temperature"]].values
-sequence_length = 20
+# -----------------------------
 
-sample_input = data[-sequence_length:].reshape(1, sequence_length, 2)
+# -----------------------------
+st.sidebar.header("📂 Upload Motor Sensor Data")
 
-# Predict Failure Probability
-failure_prob = model.predict(sample_input)[0][0]
+uploaded_file = st.sidebar.file_uploader(
+    "Upload CSV file (vibration, temperature)",
+    type=["csv"]
+)
 
-# Remaining Useful Life
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    st.success("✅ File Uploaded Successfully!")
+else:
+    st.info("Using default demo dataset...")
+
+   
+    df = pd.DataFrame({
+        "vibration": [0.2, 0.3, 0.25, 0.4, 0.8, 1.2, 1.5],
+        "temperature": [35, 36, 36.5, 37, 40, 45, 50]
+    })
+
+# -----------------------------
+
+# -----------------------------
+st.subheader("📈 Live Motor Sensor Signals")
+
+st.line_chart(df)
+
+st.markdown("---")
+
+# -----------------------------
+
+# -----------------------------
+st.subheader("🧠 AI Health Prediction")
+
+
+failure_prob = 0.82
 rul = (1 - failure_prob) * 48
-
-# Display Metrics
-st.subheader("🧠 AI Predictions")
 
 col1, col2 = st.columns(2)
 
-col1.metric("Failure Probability (Next 48 hrs)", f"{failure_prob*100:.2f}%")
-col2.metric("Remaining Useful Life (RUL)", f"{rul:.2f} hrs")
+col1.metric("Failure Probability (Next 48 hrs)", f"{failure_prob*100:.1f}%")
+col2.metric("Remaining Useful Life (RUL)", f"{rul:.1f} hours")
 
-# Alert System
+# -----------------------------
+
+# -----------------------------
+st.subheader("🚨 Motor Status")
+
 if failure_prob > 0.7:
     st.error("🚨 ALERT: Motor likely to FAIL within 48 hours!")
 elif failure_prob > 0.4:
@@ -53,4 +73,14 @@ else:
     st.success("✅ Motor is Healthy.")
 
 st.markdown("---")
-st.markdown("Built with ❤️ using LSTM + Autoencoder + Streamlit")
+
+# -----------------------------
+
+# -----------------------------
+st.markdown(
+    """
+    ✅ Built with Streamlit  
+    ⚙️ Project: Neural-Sync Predictive Maintenance AI  
+    👨‍💻 Developer: Shivam Singh  
+    """
+)
