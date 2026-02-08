@@ -3,6 +3,13 @@ import pandas as pd
 import numpy as np
 from tensorflow.keras.models import load_model
 
+@st.cache_resource
+def load_failure_model():
+    return load_model("failure_predictor_lstm.h5")
+
+model = load_failure_model()
+
+
 # Load Data + Model
 df = pd.read_csv("motor_data.csv")
 model = load_model("failure_predictor_lstm.h5")
